@@ -12,6 +12,12 @@ def load_current_resource
   @environment                  = new_resource.environment
   @environment["PATH"]          = @path.join(":")
   @environment["RBENV_ROOT"]    = rbenv_root_path
+  log "ruby_version: #{new_resource.ruby_version}" do 
+    level :info
+  end
+  log "environment: #{new_resource.environment}" do 
+    level :info
+  end
   @environment.delete("RBENV_VERSION") if !new_resource.ruby_version
   @environment["RBENV_VERSION"] = new_resource.ruby_version if new_resource.ruby_version
 
