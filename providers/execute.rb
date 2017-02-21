@@ -5,11 +5,16 @@
 # Author:: Jamie Winsor (<jamie@vialstudios.com>)
 #
 
+require 'etc'
+
 include Chef::Mixin::Rbenv
 
 def load_current_resource
+  @user                         = new_resource.user || Etc.getlogin
+  @home                         = Etc.getpwnam(@user).dir
   @path                         = [ rbenv_shims_path, rbenv_bin_path ] + new_resource.path + system_path
   @environment                  = new_resource.environment
+  @environment["HOME"]          = @home
   @environment["PATH"]          = @path.join(":")
   @environment["RBENV_ROOT"]    = rbenv_root_path
   @environment.delete("RBENV_VERSION") if !new_resource.ruby_version
