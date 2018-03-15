@@ -15,6 +15,7 @@ def load_current_resource
   @environment["RBENV_ROOT"]    = rbenv_root_path
   @environment.delete("RBENV_VERSION") if !new_resource.ruby_version
   @environment["RBENV_VERSION"] = new_resource.ruby_version if new_resource.ruby_version
+  @environment["PKG_CONFIG_PATH"] = "/usr/lib/x86_64-linux-gnu/pkgconfig"
 
   new_resource.environment(@environment)
 end
