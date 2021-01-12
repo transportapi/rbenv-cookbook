@@ -83,13 +83,23 @@ class Chef
         def install_via_gem_command(name, version = nil)
           src            = @new_resource.source && "  --source=#{@new_resource.source} --source=http://rubygems.org"
           version_option = (version.nil? || version.empty?) ? "" : " -v \"#{version}\""
+          ruby_version   = @new_resource.ruby_version
+
+          # RubyGems shipped with Ruby 2.6 replaced the `--no-rdoc --no-ri`
+          # options with `--no-document`.
+          no_documentation =
+            if Gem::Version.new(ruby_version) > Gem::Version.new('2.5')
+              '--no-document'
+            else
+              '--no-rdoc --no-ri'
+            end
 
           shell_out!(
-            "#{gem_binary_path} install #{name} -q --no-rdoc --no-ri #{version_option} #{src}#{opts}",
+            "#{gem_binary_path} install #{name} -q #{no_documentation} #{version_option} #{src}#{opts}",
             :user => node[:rbenv][:user],
             :group => node[:rbenv][:group],
             :env => {
-              'RBENV_VERSION' => @new_resource.ruby_version,
+              'RBENV_VERSION' => ruby_version,
               'RBENV_ROOT'    => @rbenv_root
             }
           )
